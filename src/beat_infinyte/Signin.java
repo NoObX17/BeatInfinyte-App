@@ -52,7 +52,7 @@ public class Signin extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logofinal.png"))); // NOI18N
 
         UserField.setBackground(new java.awt.Color(136, 136, 136));
-        UserField.setBorder(null);
+        UserField.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(136, 136, 136)));
         UserField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 UserFieldActionPerformed(evt);
@@ -72,7 +72,7 @@ public class Signin extends javax.swing.JFrame {
         });
 
         PasswordField.setBackground(new java.awt.Color(136, 136, 136));
-        PasswordField.setBorder(null);
+        PasswordField.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(136, 136, 136)));
 
         jLabel2.setFont(new java.awt.Font("Platinum Sign Over", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -85,7 +85,7 @@ public class Signin extends javax.swing.JFrame {
         jLabel3.setText("USERNAME");
 
         PasswordField2.setBackground(new java.awt.Color(136, 136, 136));
-        PasswordField2.setBorder(null);
+        PasswordField2.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(136, 136, 136)));
 
         jLabel4.setFont(new java.awt.Font("Platinum Sign Over", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));

@@ -54,7 +54,7 @@ public class Login extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logofinal.png"))); // NOI18N
 
         UsernameField.setBackground(new java.awt.Color(136, 136, 136));
-        UsernameField.setBorder(null);
+        UsernameField.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(136, 136, 136)));
         UsernameField.setOpaque(true);
 
         LoginButton.setBackground(new java.awt.Color(136, 136, 136));
@@ -74,7 +74,7 @@ public class Login extends javax.swing.JFrame {
         });
 
         PasswordField.setBackground(new java.awt.Color(136, 136, 136));
-        PasswordField.setBorder(null);
+        PasswordField.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(136, 136, 136)));
 
         jLabel2.setFont(new java.awt.Font("Platinum Sign Over", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -223,11 +223,7 @@ public class Login extends javax.swing.JFrame {
     
     //METODOS
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
