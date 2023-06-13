@@ -14,7 +14,7 @@ import java.sql.*;
 public class UserMenu extends javax.swing.JFrame {
 
     // ATRIBUTOS
-    private String username = "algo";
+    private String username;
     
     public UserMenu() {
         this.mostarUser(MainMenu.id_user);

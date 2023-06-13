@@ -7,20 +7,36 @@ package beat_infinyte;
 import java.awt.Color;
 import javax.swing.BorderFactory;
 import DB.Conexion;
+import java.awt.datatransfer.FlavorListener;
 import java.sql.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 /**
  *
  * @author hugos
  */
 public class MainMenu extends javax.swing.JFrame {
 
-    //ATRIBUTO
+    //ATRIBUTOS
     protected static int id_user;
+    String[] Titulos = {"NOMBRE", "DESCARGA", "GENERO"}; //Arreglo de los titulos para la tabla
+    DefaultTableModel dtm_datos = new DefaultTableModel(); //creamos  un modelo para la taba de datos
+    TableRowSorter<TableModel> trs; //Hacemos el table row sorter para poder ordenar la tabla al presionar los encabezados de la misma
+    ResultSet rs;  //el result set es el resultado de la consulta que mandamos por sql
+    String[][] M_datos;  //iniciamos una matriz donde pasaremos los datos de sql
+    Conexion cc = new Conexion();   //iniciamos un objeto que se encargara de la conexion de datos
+    String query;
+    boolean flagSongs = false;
+    boolean flagTrap = false;
+    boolean flagRap = false;
+    boolean flagReggaeton = false;
     
     //CONSTRUCTOR
     public MainMenu(int id_user) {
         MainMenu.id_user = id_user;
         initComponents();
+        datos_tabla();
     }
 
     /**
@@ -35,17 +51,18 @@ public class MainMenu extends javax.swing.JFrame {
         ventana = new javax.swing.JPanel();
         LogoMain = new javax.swing.JLabel();
         navbar = new javax.swing.JPanel();
-        Reggaeton = new javax.swing.JPanel();
+        Songs = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         Trap = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         Settings = new javax.swing.JLabel();
         Rap = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        Songs = new javax.swing.JPanel();
+        Reggaeton = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        tabla = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -56,33 +73,33 @@ public class MainMenu extends javax.swing.JFrame {
 
         navbar.setBackground(new java.awt.Color(111, 111, 111));
 
-        Reggaeton.setBackground(new java.awt.Color(52, 52, 52));
-        Reggaeton.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 3, 3, new java.awt.Color(188, 245, 28)));
-        Reggaeton.addMouseListener(new java.awt.event.MouseAdapter() {
+        Songs.setBackground(new java.awt.Color(52, 52, 52));
+        Songs.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 3, 3, new java.awt.Color(188, 245, 28)));
+        Songs.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ReggaetonMouseClicked(evt);
+                SongsMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                ReggaetonMouseEntered(evt);
+                SongsMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                ReggaetonMouseExited(evt);
+                SongsMouseExited(evt);
             }
         });
 
         jLabel3.setFont(new java.awt.Font("Platinum Sign Over", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("REGGAETON");
+        jLabel3.setText("ALL SONGS");
 
-        javax.swing.GroupLayout ReggaetonLayout = new javax.swing.GroupLayout(Reggaeton);
-        Reggaeton.setLayout(ReggaetonLayout);
-        ReggaetonLayout.setHorizontalGroup(
-            ReggaetonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout SongsLayout = new javax.swing.GroupLayout(Songs);
+        Songs.setLayout(SongsLayout);
+        SongsLayout.setHorizontalGroup(
+            SongsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
         );
-        ReggaetonLayout.setVerticalGroup(
-            ReggaetonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        SongsLayout.setVerticalGroup(
+            SongsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -153,34 +170,34 @@ public class MainMenu extends javax.swing.JFrame {
             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        Songs.setBackground(new java.awt.Color(52, 52, 52));
-        Songs.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 3, 3, new java.awt.Color(52, 52, 52)));
-        Songs.setPreferredSize(new java.awt.Dimension(193, 5));
-        Songs.addMouseListener(new java.awt.event.MouseAdapter() {
+        Reggaeton.setBackground(new java.awt.Color(52, 52, 52));
+        Reggaeton.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 3, 3, new java.awt.Color(52, 52, 52)));
+        Reggaeton.setPreferredSize(new java.awt.Dimension(193, 5));
+        Reggaeton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                SongsMouseClicked(evt);
+                ReggaetonMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                SongsMouseEntered(evt);
+                ReggaetonMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                SongsMouseExited(evt);
+                ReggaetonMouseExited(evt);
             }
         });
 
         jLabel1.setFont(new java.awt.Font("Platinum Sign Over", 0, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("YOUR SONGS");
+        jLabel1.setText("REGGAETON");
 
-        javax.swing.GroupLayout SongsLayout = new javax.swing.GroupLayout(Songs);
-        Songs.setLayout(SongsLayout);
-        SongsLayout.setHorizontalGroup(
-            SongsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout ReggaetonLayout = new javax.swing.GroupLayout(Reggaeton);
+        Reggaeton.setLayout(ReggaetonLayout);
+        ReggaetonLayout.setHorizontalGroup(
+            ReggaetonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
         );
-        SongsLayout.setVerticalGroup(
-            SongsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        ReggaetonLayout.setVerticalGroup(
+            ReggaetonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -190,14 +207,14 @@ public class MainMenu extends javax.swing.JFrame {
             navbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(navbarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(Reggaeton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Songs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Trap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Rap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(148, 148, 148)
-                .addComponent(Songs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
+                .addComponent(Reggaeton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(142, 142, 142)
                 .addComponent(Settings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         navbarLayout.setVerticalGroup(
@@ -205,9 +222,9 @@ public class MainMenu extends javax.swing.JFrame {
             .addGroup(navbarLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(navbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Reggaeton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Songs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(Trap, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Songs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                    .addComponent(Reggaeton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
                     .addComponent(Rap, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, navbarLayout.createSequentialGroup()
@@ -217,34 +234,35 @@ public class MainMenu extends javax.swing.JFrame {
 
         jPanel3.setBackground(new java.awt.Color(111, 111, 111));
 
-        jPanel2.setPreferredSize(new java.awt.Dimension(200, 50));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 930, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
-        );
+        jTable1.setBackground(new java.awt.Color(177, 177, 177));
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tabla.setViewportView(jTable1);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 930, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(tabla, javax.swing.GroupLayout.PREFERRED_SIZE, 911, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(449, Short.MAX_VALUE))
+                .addGap(50, 50, 50)
+                .addComponent(tabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(99, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout ventanaLayout = new javax.swing.GroupLayout(ventana);
@@ -270,7 +288,7 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(navbar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(29, 29, 29)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(58, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -288,23 +306,210 @@ public class MainMenu extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    
+    //Creacion de la tabla de datos 
+    private void datos_tabla() {
+        
+        int contador = 0;  //creamos un contador para saber el numero de datos que obtendremos de la tabla datos de sql
+        try { //para las consultas sql siempre vamos a ocupar un try catch por su ocurre un error
+            Statement st_cont = Conexion.conexion.createStatement(); //el statement nos ayuda a procesar una sentencia sql 
+            ResultSet rs_cont = st_cont.executeQuery("SELECT COUNT(*) AS count FROM Canciones"); // asignamos los datos obtenidos de la consulta al result set
+             if (rs_cont.next()) {
+                contador = rs_cont.getInt("count");
+            }
+//lo anterior fue solo para conocer el numero de datos que manejariamos esto mediante logra gracias con count de sql y con el  * le decimos que nos cuenta todas las filas de la tabla
 
+            
+            Statement st = Conexion.conexion.createStatement(); //ahora vamos a  hacer lo mismo solo que esta vez no obtendremos el numero de filas en la tabla
+            ResultSet rs = st.executeQuery("SELECT `Nombre`, `Descarga`, `Tipo` FROM `Canciones`") ; //aora obtendremos los datos de la tabla para mostrarlos en el jtable
+            //ResultSet rs = st.executeQuery(query);
+            
+            int cont = 0; //el contador nos ayudara para movernos en las filas de la matriz mientras que los numeros fijos (0,1,2,3) nos moveran por las 4 columnas que seran el id, nombre, etc
+            M_datos = new String[contador][3]; //definimos el tamaño de la matriz 
+            while (cont < contador) {
+                while (rs.next()) { //el while nos ayudara a recorrer los datos obtenidos en la consulta anterior y asignarlos a la matriz  
+                //agregamos los datos a la table
+                M_datos[cont][0] = rs.getString("Nombre");
+                M_datos[cont][1] = rs.getString("Descarga");
+                M_datos[cont][2] = rs.getString("Tipo");
+                cont++; //avanzamos una posicion del contador para que pase a la siguiente fila
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            //Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex); //si llegara a ocurrir un error ya se  una mala consulta o mala conexion aqui nos lo mostraria
+        }
+
+        dtm_datos = new DefaultTableModel(M_datos, Titulos) { //ahora agregaremos la matriz y los titulos al modelo de tabla
+            public boolean isCellEditable(int row, int column) {//este metodo es muy util si no quieren que editen su tabla, 
+                return false;  //si quieren modificar los campos al dar clic entonces borren este metodo
+            }
+        };
+        
+        jTable1.setModel(dtm_datos); //ahora el modelo que ya tiene tanto los datos como los titulos lo agregamos a la tabla
+        trs = new TableRowSorter<>(dtm_datos); //iniciamos el table row sorter para ordenar los datos (esto es si gustan)
+        jTable1.setRowSorter(trs); //y lo agregamos al jtable
+    }
+    
+    private void datos_tablaTrap() {
+        
+        int contador = 0;  //creamos un contador para saber el numero de datos que obtendremos de la tabla datos de sql
+        try { //para las consultas sql siempre vamos a ocupar un try catch por su ocurre un error
+            Statement st_cont = Conexion.conexion.createStatement(); //el statement nos ayuda a procesar una sentencia sql 
+            ResultSet rs_cont = st_cont.executeQuery("SELECT COUNT(*) AS count FROM Canciones WHERE `Tipo` = 'Trap'"); // asignamos los datos obtenidos de la consulta al result set
+             if (rs_cont.next()) {
+                contador = rs_cont.getInt("count");
+            }
+//lo anterior fue solo para conocer el numero de datos que manejariamos esto mediante logra gracias con count de sql y con el  * le decimos que nos cuenta todas las filas de la tabla
+
+            
+            Statement st = Conexion.conexion.createStatement(); //ahora vamos a  hacer lo mismo solo que esta vez no obtendremos el numero de filas en la tabla
+            ResultSet rs = st.executeQuery("SELECT `Nombre`, `Descarga`, `Tipo` FROM `Canciones` WHERE `Tipo` = 'Trap'") ; //aora obtendremos los datos de la tabla para mostrarlos en el jtable
+            //ResultSet rs = st.executeQuery(query);
+            
+            int cont = 0; //el contador nos ayudara para movernos en las filas de la matriz mientras que los numeros fijos (0,1,2,3) nos moveran por las 4 columnas que seran el id, nombre, etc
+            M_datos = new String[contador][3]; //definimos el tamaño de la matriz 
+            while (cont < contador) {
+                while (rs.next()) { //el while nos ayudara a recorrer los datos obtenidos en la consulta anterior y asignarlos a la matriz  
+                //agregamos los datos a la table
+                M_datos[cont][0] = rs.getString("Nombre");
+                M_datos[cont][1] = rs.getString("Descarga");
+                M_datos[cont][2] = rs.getString("Tipo");
+                cont++; //avanzamos una posicion del contador para que pase a la siguiente fila
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            //Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex); //si llegara a ocurrir un error ya se  una mala consulta o mala conexion aqui nos lo mostraria
+        }
+
+        dtm_datos = new DefaultTableModel(M_datos, Titulos) { //ahora agregaremos la matriz y los titulos al modelo de tabla
+            public boolean isCellEditable(int row, int column) {//este metodo es muy util si no quieren que editen su tabla, 
+                return false;  //si quieren modificar los campos al dar clic entonces borren este metodo
+            }
+        };
+        
+        jTable1.setModel(dtm_datos); //ahora el modelo que ya tiene tanto los datos como los titulos lo agregamos a la tabla
+        trs = new TableRowSorter<>(dtm_datos); //iniciamos el table row sorter para ordenar los datos (esto es si gustan)
+        jTable1.setRowSorter(trs); //y lo agregamos al jtable
+    }
+    
+    private void datos_tablaRap() {
+        
+        int contador = 0;  //creamos un contador para saber el numero de datos que obtendremos de la tabla datos de sql
+        try { //para las consultas sql siempre vamos a ocupar un try catch por su ocurre un error
+            Statement st_cont = Conexion.conexion.createStatement(); //el statement nos ayuda a procesar una sentencia sql 
+            ResultSet rs_cont = st_cont.executeQuery("SELECT COUNT(*) AS count FROM Canciones WHERE `Tipo` = 'Rap'"); // asignamos los datos obtenidos de la consulta al result set
+             if (rs_cont.next()) {
+                contador = rs_cont.getInt("count");
+            }
+//lo anterior fue solo para conocer el numero de datos que manejariamos esto mediante logra gracias con count de sql y con el  * le decimos que nos cuenta todas las filas de la tabla
+
+            
+            Statement st = Conexion.conexion.createStatement(); //ahora vamos a  hacer lo mismo solo que esta vez no obtendremos el numero de filas en la tabla
+            ResultSet rs = st.executeQuery("SELECT `Nombre`, `Descarga`, `Tipo` FROM `Canciones` WHERE `Tipo` = 'Rap'") ; //aora obtendremos los datos de la tabla para mostrarlos en el jtable
+            //ResultSet rs = st.executeQuery(query);
+            
+            int cont = 0; //el contador nos ayudara para movernos en las filas de la matriz mientras que los numeros fijos (0,1,2,3) nos moveran por las 4 columnas que seran el id, nombre, etc
+            M_datos = new String[contador][3]; //definimos el tamaño de la matriz 
+            while (cont < contador) {
+                while (rs.next()) { //el while nos ayudara a recorrer los datos obtenidos en la consulta anterior y asignarlos a la matriz  
+                //agregamos los datos a la table
+                M_datos[cont][0] = rs.getString("Nombre");
+                M_datos[cont][1] = rs.getString("Descarga");
+                M_datos[cont][2] = rs.getString("Tipo");
+                cont++; //avanzamos una posicion del contador para que pase a la siguiente fila
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            //Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex); //si llegara a ocurrir un error ya se  una mala consulta o mala conexion aqui nos lo mostraria
+        }
+
+        dtm_datos = new DefaultTableModel(M_datos, Titulos) { //ahora agregaremos la matriz y los titulos al modelo de tabla
+            public boolean isCellEditable(int row, int column) {//este metodo es muy util si no quieren que editen su tabla, 
+                return false;  //si quieren modificar los campos al dar clic entonces borren este metodo
+            }
+        };
+        
+        jTable1.setModel(dtm_datos); //ahora el modelo que ya tiene tanto los datos como los titulos lo agregamos a la tabla
+        trs = new TableRowSorter<>(dtm_datos); //iniciamos el table row sorter para ordenar los datos (esto es si gustan)
+        jTable1.setRowSorter(trs); //y lo agregamos al jtable
+    }
+    
+    private void datos_tablaReggaeton() {
+        
+        int contador = 0;  //creamos un contador para saber el numero de datos que obtendremos de la tabla datos de sql
+        try { //para las consultas sql siempre vamos a ocupar un try catch por su ocurre un error
+            Statement st_cont = Conexion.conexion.createStatement(); //el statement nos ayuda a procesar una sentencia sql 
+            ResultSet rs_cont = st_cont.executeQuery("SELECT COUNT(*) AS count FROM Canciones WHERE `Tipo` = 'Reggaeton'"); // asignamos los datos obtenidos de la consulta al result set
+             if (rs_cont.next()) {
+                contador = rs_cont.getInt("count");
+            }
+//lo anterior fue solo para conocer el numero de datos que manejariamos esto mediante logra gracias con count de sql y con el  * le decimos que nos cuenta todas las filas de la tabla
+
+            
+            Statement st = Conexion.conexion.createStatement(); //ahora vamos a  hacer lo mismo solo que esta vez no obtendremos el numero de filas en la tabla
+            ResultSet rs = st.executeQuery("SELECT `Nombre`, `Descarga`, `Tipo` FROM `Canciones` WHERE `Tipo` = 'Reggaeton'") ; //aora obtendremos los datos de la tabla para mostrarlos en el jtable
+            //ResultSet rs = st.executeQuery(query);
+            
+            int cont = 0; //el contador nos ayudara para movernos en las filas de la matriz mientras que los numeros fijos (0,1,2,3) nos moveran por las 4 columnas que seran el id, nombre, etc
+            M_datos = new String[contador][3]; //definimos el tamaño de la matriz 
+            while (cont < contador) {
+                while (rs.next()) { //el while nos ayudara a recorrer los datos obtenidos en la consulta anterior y asignarlos a la matriz  
+                //agregamos los datos a la table
+                M_datos[cont][0] = rs.getString("Nombre");
+                M_datos[cont][1] = rs.getString("Descarga");
+                M_datos[cont][2] = rs.getString("Tipo");
+                cont++; //avanzamos una posicion del contador para que pase a la siguiente fila
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            //Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex); //si llegara a ocurrir un error ya se  una mala consulta o mala conexion aqui nos lo mostraria
+        }
+
+        dtm_datos = new DefaultTableModel(M_datos, Titulos) { //ahora agregaremos la matriz y los titulos al modelo de tabla
+            public boolean isCellEditable(int row, int column) {//este metodo es muy util si no quieren que editen su tabla, 
+                return false;  //si quieren modificar los campos al dar clic entonces borren este metodo
+            }
+        };
+        
+        jTable1.setModel(dtm_datos); //ahora el modelo que ya tiene tanto los datos como los titulos lo agregamos a la tabla
+        trs = new TableRowSorter<>(dtm_datos); //iniciamos el table row sorter para ordenar los datos (esto es si gustan)
+        jTable1.setRowSorter(trs); //y lo agregamos al jtable
+    }
+    
     private void SettingsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SettingsMouseClicked
         UserMenu user = new UserMenu();
         user.setVisible(true);
     }//GEN-LAST:event_SettingsMouseClicked
     
-    private void ReggaetonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseEntered
-        Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
-    }//GEN-LAST:event_ReggaetonMouseEntered
+    private void SongsMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseEntered
+        Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+    }//GEN-LAST:event_SongsMouseEntered
 
-    private void ReggaetonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseExited
-        //jPanel5.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
-    }//GEN-LAST:event_ReggaetonMouseExited
+    private void SongsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseExited
+        if (flagSongs) {
+            Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        }
+        if (!flagSongs){
+            Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        }   
+    }//GEN-LAST:event_SongsMouseExited
 
-    private void ReggaetonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseClicked
-        
-    }//GEN-LAST:event_ReggaetonMouseClicked
+    private void SongsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseClicked
+        datos_tabla();
+        flagSongs = true;
+        flagRap = false;
+        flagTrap = false;
+        flagReggaeton = false;
+        Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+    }//GEN-LAST:event_SongsMouseClicked
 
     private void TrapMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TrapMouseEntered
         Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
@@ -312,12 +517,25 @@ public class MainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_TrapMouseEntered
 
     private void TrapMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TrapMouseExited
-        Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
-        
+        if (flagTrap) {
+            Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        }
+        if (!flagTrap){
+            Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        }
     }//GEN-LAST:event_TrapMouseExited
 
     private void TrapMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TrapMouseClicked
-        // TODO add your handling code here:
+        datos_tablaTrap();
+        flagTrap = true;
+        flagRap = false;
+        flagReggaeton = false;
+        flagSongs = false;
+        
+        Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
     }//GEN-LAST:event_TrapMouseClicked
 
     private void RapMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RapMouseEntered
@@ -325,24 +543,52 @@ public class MainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_RapMouseEntered
 
     private void RapMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RapMouseExited
-        Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        if (flagRap) {
+            Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        }
+        if (!flagRap){
+            Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        }
     }//GEN-LAST:event_RapMouseExited
 
     private void RapMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RapMouseClicked
-        // TODO add your handling code here:
+        datos_tablaRap();
+        flagRap = true;
+        flagTrap = false;
+        flagReggaeton = false;
+        flagSongs = false;
+        
+        Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
     }//GEN-LAST:event_RapMouseClicked
 
-    private void SongsMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseEntered
-        Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
-    }//GEN-LAST:event_SongsMouseEntered
+    private void ReggaetonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseEntered
+        Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+    }//GEN-LAST:event_ReggaetonMouseEntered
 
-    private void SongsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseExited
+    private void ReggaetonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseExited
+        if (flagReggaeton) {
+            Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
+        }
+        if (!flagReggaeton){
+            Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        }
+    }//GEN-LAST:event_ReggaetonMouseExited
+
+    private void ReggaetonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReggaetonMouseClicked
+        datos_tablaReggaeton();
+        flagRap = false;
+        flagTrap = false;
+        flagReggaeton = true;
+        flagSongs = false;
+        
+        Reggaeton.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(188,245,28)));
         Songs.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
-    }//GEN-LAST:event_SongsMouseExited
-
-    private void SongsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SongsMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_SongsMouseClicked
+        Trap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+        Rap.setBorder(BorderFactory.createMatteBorder(2, 2, 3, 3, new Color(52,52,52)));
+    }//GEN-LAST:event_ReggaetonMouseClicked
 
     /**
      * @param args the command line arguments
@@ -370,7 +616,6 @@ public class MainMenu extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -409,9 +654,10 @@ public class MainMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JTable jTable1;
     private javax.swing.JPanel navbar;
+    private javax.swing.JScrollPane tabla;
     private javax.swing.JPanel ventana;
     // End of variables declaration//GEN-END:variables
 }

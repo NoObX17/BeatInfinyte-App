@@ -167,12 +167,11 @@ public class Login extends javax.swing.JFrame {
     private void LoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginButtonActionPerformed
         PreparedStatement st;
         ResultSet rs;
-        
-        // get the username & password
+
         String username = UsernameField.getText();
         String password = String.valueOf(PasswordField.getPassword());
         
-        //create a select query to check if the username and the password exist in the database
+        //Creacion de la queary para verificar si el usuario y la contraseña estan en la BD
         String query = "SELECT * FROM `Usuario` WHERE `username` = ? AND `password` = ?";
         
         // Mostrar al usuario mensajes de campos vacios
@@ -251,7 +250,6 @@ public class Login extends javax.swing.JFrame {
         });
     }
     
-    //merodo 
     //metodo close() para cerrar ventanas
     public void close(){
         WindowEvent closeWindow = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
